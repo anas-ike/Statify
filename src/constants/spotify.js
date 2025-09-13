@@ -2,7 +2,7 @@ const MODE = import.meta.env.MODE;
 
 // Your actual URLs
 const DEV_URL = 'http://localhost:5173/';
-const PROD_URL = 'https://statify.lightsout.in/'; // ← your custom domain
+const PROD_URL = 'https://adorable-faun-ab9da1.netlify.app/'; // ← your custom domain
 
 const SCOPES = [
     'user-read-email',
