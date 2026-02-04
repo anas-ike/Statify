@@ -6,10 +6,11 @@ import { useCurrentUser } from './hooks'
 import getCurrentUser from './api/getCurrentUser'
 
 function App() {
-  const { setCurrentUser } = useCurrentUser()
+  const { setCurrentUser, currentUser } = useCurrentUser()
 
   useEffect(() => {
-    fetchGetCurrentUser()
+    const token = localStorage.getItem("spotify_token")
+    if (token) fetchGetCurrentUser()
   }, [])
 
   async function fetchGetCurrentUser() {
@@ -23,24 +24,19 @@ function App() {
 
   return (
     <>
-      <NavbarHome />
+      {currentUser && <NavbarHome />}
+
       <Routes>
         <Route path='/' element={<Login />} />
         <Route path='/home' element={<Home />} />
         <Route path='/top' element={<Top />} />
         <Route path='/recently' element={<Recently />} />
-        <Route path='/track'>
-          <Route path=':id' element={<TrackDetails />} />
-        </Route>
-        <Route path='/artist'>
-          <Route path=':id' element={<ArtistDetails />} />
-        </Route>
-        <Route path='/playlist'>
-          <Route path=':id' element={<PlaylistDetails />} />
-        </Route>
-        <Route paath='/search'>
-          <Route path=':query' element={<SearchDetails />} />
-        </Route>
+
+        <Route path='/track/:id' element={<TrackDetails />} />
+        <Route path='/artist/:id' element={<ArtistDetails />} />
+        <Route path='/playlist/:id' element={<PlaylistDetails />} />
+        <Route path='/search/:query' element={<SearchDetails />} />
+
         <Route path='*' element={<Login />} />
       </Routes>
     </>
