@@ -1,125 +1,15 @@
-import { SPOTIFY } from '../constants/spotify.js'
+export const getAuth = () => {
+  const hash = window.location.hash.substring(1);
+  const params = new URLSearchParams(hash);
 
-const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID
-const { REDIRECT_URI, AUTH_ENDPOINT, TOKEN_ENDPOINT, SCOPES } = SPOTIFY
+  const accessToken = params.get("access_token");
+  const expiresIn = params.get("expires_in");
 
-const CURRENT_TOKEN = {
-  access_token: localStorage.getItem('access_token') || '',
-  refresh_token: localStorage.getItem('refresh_token') || '',
-  expires_at: localStorage.getItem('expires_at') || '',
-
-  save: (token) => {
-    localStorage.setItem('access_token', token.access_token)
-    localStorage.setItem('refresh_token', token.refresh_token)
-    localStorage.setItem('expires_at', Date.now() + token.expires_in * 1000)
-  },
-}
-
-const generateRandomString = () => {
-  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  const values = crypto.getRandomValues(new Uint8Array(64))
-  return values.reduce((acc, x) => acc + possible[x % possible.length], '')
-}
-
-const sha256 = async (plain) => {
-  const encoder = new TextEncoder()
-  return crypto.subtle.digest('SHA-256', encoder.encode(plain))
-}
-
-const base64encode = (input) =>
-  btoa(String.fromCharCode(...new Uint8Array(input)))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '')
-
-const getCodeChallenge = async (verifier) => base64encode(await sha256(verifier))
-
-const generateUrl = (base, params) => {
-  const url = new URL(base)
-  url.search = new URLSearchParams(params).toString()
-  return url.toString()
-}
-
-async function redirectToSpotifyAuthorize() {
-  const codeVerifier = generateRandomString()
-  const codeChallenge = await getCodeChallenge(codeVerifier)
-
-  localStorage.setItem('code_verifier', codeVerifier)
-
-  const params = {
-    response_type: 'code',
-    client_id: CLIENT_ID,
-    scope: SCOPES.join(" "), // 🔥 FIXED
-    code_challenge_method: 'S256',
-    code_challenge: codeChallenge,
-    redirect_uri: REDIRECT_URI,
+  if (accessToken) {
+    localStorage.setItem("spotify_token", accessToken);
+    localStorage.setItem("spotify_expires", Date.now() + expiresIn * 1000);
+    window.location.hash = "";
   }
 
-  window.location.href = generateUrl(AUTH_ENDPOINT, params)
-}
-
-const getCodeFromUrl = () => {
-  const urlParams = new URLSearchParams(window.location.search)
-  return urlParams.get('code')
-}
-
-async function getToken(code) {
-  const verifier = localStorage.getItem('code_verifier')
-
-  const response = await fetch(TOKEN_ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      client_id: CLIENT_ID,
-      grant_type: 'authorization_code',
-      code,
-      redirect_uri: REDIRECT_URI,
-      code_verifier: verifier,
-    }),
-  })
-
-  return await response.json()
-}
-
-async function refreshToken() {
-  const response = await fetch(TOKEN_ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      client_id: CLIENT_ID,
-      grant_type: 'refresh_token',
-      refresh_token: CURRENT_TOKEN.refresh_token,
-    }),
-  })
-
-  return await response.json()
-}
-
-async function getAccessToken() {
-  const code = getCodeFromUrl()
-  if (!code) return
-
-  const token = await getToken(code)
-  CURRENT_TOKEN.save(token)
-
-  window.location.href = '/home'
-}
-
-getAccessToken()
-
-export async function logIn() {
-  await redirectToSpotifyAuthorize()
-}
-
-export function logOut() {
-  localStorage.clear()
-  window.location.href = REDIRECT_URI
-}
-
-export async function autoRefreshToken() {
-  const expiresAt = localStorage.getItem('expires_at')
-  if (Date.now() > expiresAt) {
-    const token = await refreshToken()
-    CURRENT_TOKEN.save(token)
-  }
-}
+  return accessToken;
+};
