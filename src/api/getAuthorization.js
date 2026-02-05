@@ -1,25 +1,13 @@
-const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
-const redirectUri = import.meta.env.VITE_SPOTIFY_REDIRECT_URI;
+import { SPOTIFY } from '../constants/spotify.js';
 
-const scopes = [
-  "user-read-private",
-  "user-read-email",
-  "user-top-read",
-  "user-read-recently-played",
-  "user-read-playback-state",
-  "user-modify-playback-state",
-];
+const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
+const { REDIRECT_URI, AUTH_ENDPOINT, SCOPES } = SPOTIFY;
+const RESPONSE_TYPE = 'token';
 
-export const getAuthorization = () => {
-  const authUrl =
-    "https://accounts.spotify.com/authorize?" +
-    new URLSearchParams({
-      client_id: clientId,
-      response_type: "token",
-      redirect_uri: redirectUri,
-      scope: scopes.join(" "),
-      show_dialog: "true",
-    });
-
-  window.location.href = authUrl;
-};
+export const accessUrl =
+    AUTH_ENDPOINT +
+    '?client_id=' + CLIENT_ID +
+    '&redirect_uri=' + REDIRECT_URI +
+    '&scope=' + SCOPES.join('%20') +
+    '&response_type=' + RESPONSE_TYPE + 
+    '&show_dialog=true';
