@@ -9,7 +9,7 @@ function App() {
   const { setCurrentUser, currentUser } = useCurrentUser()
 
   useEffect(() => {
-    const token = localStorage.getItem("spotify_token")
+    const token = localStorage.getItem("access_token") // 🔥 FIXED
     if (token) fetchGetCurrentUser()
   }, [])
 
@@ -17,8 +17,8 @@ function App() {
     try {
       const response = await getCurrentUser()
       setCurrentUser(response)
-    } catch (error) {
-      console.error('Error fetching current user:', error)
+    } catch (err) {
+      console.error("User fetch error", err)
     }
   }
 
