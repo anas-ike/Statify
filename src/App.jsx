@@ -9,7 +9,7 @@ function App() {
   const { setCurrentUser, currentUser } = useCurrentUser()
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token") // 🔥 FIXED
+    const token = localStorage.getItem("access_token")
     if (token) fetchGetCurrentUser()
   }, [])
 
@@ -17,8 +17,8 @@ function App() {
     try {
       const response = await getCurrentUser()
       setCurrentUser(response)
-    } catch (err) {
-      console.error("User fetch error", err)
+    } catch (error) {
+      console.error('Error fetching current user:', error)
     }
   }
 
@@ -31,12 +31,10 @@ function App() {
         <Route path='/home' element={<Home />} />
         <Route path='/top' element={<Top />} />
         <Route path='/recently' element={<Recently />} />
-
         <Route path='/track/:id' element={<TrackDetails />} />
         <Route path='/artist/:id' element={<ArtistDetails />} />
         <Route path='/playlist/:id' element={<PlaylistDetails />} />
         <Route path='/search/:query' element={<SearchDetails />} />
-
         <Route path='*' element={<Login />} />
       </Routes>
     </>
