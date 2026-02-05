@@ -1,23 +1,18 @@
-export const fetchEndPoint = async (url) => {
-  const token = localStorage.getItem("spotify_token");
+const fetchEndPoint = async (accessToken, endPoint) => {
+  if (!accessToken) return null
 
-  if (!token) return null;
+  const response = await fetch(endPoint, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  })
 
-  try {
-    const res = await fetch(`https://api.spotify.com/v1/${url}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!res.ok) {
-      console.error("Spotify API Error:", res.status);
-      return null;
-    }
-
-    return await res.json();
-  } catch (err) {
-    console.error("Fetch failed:", err);
-    return null;
+  if (!response.ok) {
+    console.error("Spotify API Error:", response.status, endPoint)
+    return null
   }
-};
+
+  return await response.json()
+}
+
+export default fetchEndPoint
