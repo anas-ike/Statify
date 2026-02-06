@@ -9,7 +9,7 @@ function App() {
   const { setCurrentUser, currentUser } = useCurrentUser()
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token")
+    const token = localStorage.getItem("access_token") // FIXED
     if (token) fetchGetCurrentUser()
   }, [])
 
@@ -31,10 +31,12 @@ function App() {
         <Route path='/home' element={<Home />} />
         <Route path='/top' element={<Top />} />
         <Route path='/recently' element={<Recently />} />
+
         <Route path='/track/:id' element={<TrackDetails />} />
         <Route path='/artist/:id' element={<ArtistDetails />} />
         <Route path='/playlist/:id' element={<PlaylistDetails />} />
         <Route path='/search/:query' element={<SearchDetails />} />
+
         <Route path='*' element={<Login />} />
       </Routes>
     </>
