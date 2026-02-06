@@ -3,7 +3,7 @@ const fetchEndPoint = async (accessToken, endPoint) => {
 
   const response = await fetch(endPoint, {
     headers: {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: 'Bearer ' + accessToken,
     },
   })
 
